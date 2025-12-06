@@ -84,10 +84,7 @@ def demonstration():
 
     # Prédictions multiples
     n_samples = 5
-    new_X_multi = np.hstack([
-        np.ones((n_samples, 1)), 
-        np.random.randn(n_samples, n_features)
-    ])
+    new_X_multi = np.hstack([np.ones((n_samples, 1)), np.random.randn(n_samples, n_features)])
     pred_multi = results.model.predict(new_X_multi)
     
     print(f"\nPrédictions multiples ({n_samples} échantillons) :")
