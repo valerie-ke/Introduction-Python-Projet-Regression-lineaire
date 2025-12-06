@@ -19,11 +19,9 @@ def test_pipeline_complet():
     results = linear_regression_pipeline(dataset)
     
     assert results.model._is_fitted, "Le modèle devrait être entraîné"
-    assert len(results.model.coefficients) == 4, \
-        f"Attendu 4 coefficients, reçu {len(results.model.coefficients)}"
-    assert 0 <= results.R2 <= 1, f"R² hors limites : {results.R2}"
-    assert len(results.y_true) == len(results.y_pred), \
-        "y_true et y_pred doivent avoir la même longueur"
+    assert len(results.model.coefficients) == 4, f"Attendu 4 coefficients, reçu {len(results.model.coefficients)}"
+    assert 0 <= results.R2 <= 1, f"R^2 hors limites : {results.R2}"
+    assert len(results.y_true) == len(results.y_pred), "y_true et y_pred doivent avoir la même longueur"
 
 # Test 2a
 def test_add_intercept():
@@ -35,12 +33,9 @@ def test_add_intercept():
     dataset.add_intercept()
     shape_after = dataset.X.shape
     
-    assert shape_after[1] == shape_before[1] + 1, \
-        "Une colonne devrait avoir été ajoutée"
-    assert dataset.features_name[0] == "intercept", \
-        "Le premier nom devrait être 'intercept'"
-    assert np.allclose(dataset.X[:, 0], 1), \
-        "La première colonne devrait contenir des 1"
+    assert shape_after[1] == shape_before[1] + 1, "Une colonne devrait avoir été ajoutée"
+    assert dataset.features_name[0] == "intercept", "Le premier nom devrait être 'intercept'"
+    assert np.allclose(dataset.X[:, 0], 1), "La première colonne devrait contenir des 1"
 
 # Test 2b
 def test_add_intercept_idempotence():
@@ -50,14 +45,12 @@ def test_add_intercept_idempotence():
     dataset.add_intercept()
     
     shape_before = dataset.X.shape
-    dataset.add_intercept()  # Appel répété
+    dataset.add_intercept()  
     dataset.add_intercept()  # Appel répété
     shape_after = dataset.X.shape
     
-    assert shape_after == shape_before, \
-        "Appels répétés ne doivent pas ajouter de colonnes"
-    assert dataset.features_name.count("intercept") == 1, \
-        "Un seul 'intercept' doit être présent"
+    assert shape_after == shape_before, "Appels répétés ne doivent pas ajouter de colonnes"
+    assert dataset.features_name.count("intercept") == 1, "Un seul intercept doit être présent"
 
 # Test 3 
 def test_regression_une_feature():
@@ -67,23 +60,19 @@ def test_regression_une_feature():
     dataset = Dataset(X_one, y_one)
     results = linear_regression_pipeline(dataset)
     
-    assert len(results.model.coefficients) == 2, \
-        "Devrait avoir 2 coefficients (intercept + 1 feature)"
-    assert results.R2 > 0.5, \
-        f"R^2 devrait être > 0.5, reçu {results.R2:.4f}"
+    assert len(results.model.coefficients) == 2, "Devrait avoir 2 coefficients (intercept + 1 feature)"
+    assert results.R2 > 0.5, f"R^2 devrait être > 0.5, reçu {results.R2:.4f}"
 
 # Test 4 
 def test_dataset_large():
     """ Test avec un grand dataset """
     X_large, y_large = make_regression(n_samples=1000, n_features=5,  noise=20, random_state=1)
-    # petit bruit -> noise = 20 (à faire varier mais donc changer l'assert car 0,8 est strict)
+    # petit bruit -> noise = 20 (à faire varier mais donc changer l'assert car R^2 = 0,8 plutôt strict)
     dataset = Dataset(X_large, y_large)
     results = linear_regression_pipeline(dataset)
     
-    assert len(results.model.coefficients) == 6, \
-        "Devrait avoir 6 coefficients (5 features + intercept)"
-    assert results.R2 > 0.8, \
-        f"R^2 devrait être > 0.8, reçu {results.R2:.4f}"
+    assert len(results.model.coefficients) == 6, "Devrait avoir 6 coefficients (5 features + intercept)"
+    assert results.R2 > 0.8, f"R^2 devrait être > 0.8, reçu {results.R2:.4f}"
 
 #  Test 5 
 def test_coefficients_to_dict():
@@ -95,10 +84,8 @@ def test_coefficients_to_dict():
     coef_dict = results.model.to_dict()
     
     assert isinstance(coef_dict, dict), "Doit retourner un dictionnaire"
-    assert all(name in coef_dict for name in results.model.features_names), \
-        "Tous les noms de features doivent être présents"
-    assert all(isinstance(v, (float, np.floating)) for v in coef_dict.values()), \
-        "Toutes les valeurs doivent être des floats"
+    assert all(name in coef_dict for name in results.model.features_names), "Tous les noms de features doivent être présents"
+    assert all(isinstance(v, (float, np.floating)) for v in coef_dict.values()), "Toutes les valeurs doivent être des floats"
     
 #  Test 6 
 def test_prediction_nouvelles_donnees():
@@ -122,10 +109,8 @@ def test_prediction_nouvelles_donnees():
     new_X_multi = np.hstack([np.ones((n_samples, 1)), np.random.randn(n_samples, n_features)])
     pred_multi = results.model.predict(new_X_multi)
     
-    assert pred_multi.shape == (n_samples,), \
-        f"Devrait retourner {n_samples} prédictions"
-    assert not np.isnan(pred_multi).any(), \
-        "Aucune prédiction ne devrait être NaN"
+    assert pred_multi.shape == (n_samples,), f"Devrait retourner {n_samples} prédictions"
+    assert not np.isnan(pred_multi).any(), "Aucune prédiction ne devrait être NaN"
 
 #  Test 7 
 def test_exceptions():
@@ -172,7 +157,7 @@ def test_validation_sklearn():
     y_pred_sklearn = sklearn_model.predict(X_with_intercept)
     r2_sklearn = r2_score(y_val, y_pred_sklearn)
     
-    assert np.allclose(results.R2, r2_sklearn, atol=1e-10), f"R² différent de sklearn : {abs(results.R2 - r2_sklearn)}"
+    assert np.allclose(results.R2, r2_sklearn, atol=1e-10), f"R^2 différent de sklearn : {abs(results.R2 - r2_sklearn)}"
     assert np.allclose(results.model.coefficients, sklearn_model.coef_, atol=1e-10), "Coefficients différents de sklearn"
 
 # Test 9
